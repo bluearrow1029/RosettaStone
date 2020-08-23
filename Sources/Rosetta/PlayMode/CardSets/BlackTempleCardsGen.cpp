@@ -13,13 +13,17 @@
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/ConditionTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/CustomTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/DamageTask.hpp>
+#include <Rosetta/PlayMode/Tasks/SimpleTasks/DiscoverTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/DrawStackTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/FilterStackTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/FlagTask.hpp>
+#include <Rosetta/PlayMode/Tasks/SimpleTasks/GetGameTagTask.hpp>
+#include <Rosetta/PlayMode/Tasks/SimpleTasks/HealTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/IncludeTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/ManaCrystalTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/RandomTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/SetGameTagTask.hpp>
+#include <Rosetta/PlayMode/Tasks/SimpleTasks/SummonCopyTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/SummonOpTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/SummonStackTask.hpp>
 #include <Rosetta/PlayMode/Tasks/SimpleTasks/SummonTask.hpp>
@@ -802,11 +806,17 @@ void BlackTempleCardsGen::AddPriest(std::map<std::string, CardDef>& cards)
     // [BT_252] Renew - COST: 1
     //  - Set: BLACK_TEMPLE, Rarity: Common
     // --------------------------------------------------------
-    // Text: Restore #3 Health. <b>Discover</b> a spell.
+    // Text: Restore 3 Health. <b>Discover</b> a spell.
     // --------------------------------------------------------
     // GameTag:
     //  - DISCOVER = 1
     // --------------------------------------------------------
+    power.ClearData();
+    power.AddPowerTask(std::make_shared<HealTask>(EntityType::ALL, 3));
+    power.AddPowerTask(std::make_shared<DiscoverTask>(DiscoverType::SPELL));
+    cards.emplace(
+        "BT_252",
+        CardDef(power, PlayReqs{ { PlayReq::REQ_TARGET_TO_PLAY, 0 } }));
 
     // ----------------------------------------- SPELL - PRIEST
     // [BT_253] Psyche Split - COST: 5
@@ -814,6 +824,13 @@ void BlackTempleCardsGen::AddPriest(std::map<std::string, CardDef>& cards)
     // --------------------------------------------------------
     // Text: Give a minion +1/+2. Summon a copy of it.
     // --------------------------------------------------------
+    power.ClearData();
+    power.AddPowerTask(std::make_shared<AddEnchantmentTask>("BT_253e", EntityType::TARGET));
+    power.AddPowerTask(std::make_shared<SummonCopyTask>(EntityType::TARGET));
+    cards.emplace(
+        "BT_253",
+        CardDef(power, PlayReqs{ { PlayReq::REQ_TARGET_TO_PLAY, 0 },
+                                 { PlayReq::REQ_MINION_TARGET, 0 } }));
 
     // ---------------------------------------- MINION - PRIEST
     // [BT_254] Sethekk Veilweaver - COST: 2 [ATK: 2/HP: 3]
@@ -846,6 +863,14 @@ void BlackTempleCardsGen::AddPriest(std::map<std::string, CardDef>& cards)
     // RefTag:
     //  - LIFESTEAL = 1
     // --------------------------------------------------------
+    power.ClearData();
+    power.AddPowerTask(
+        std::make_shared<AddEnchantmentTask>("BT_257e", EntityType::TARGET));
+    cards.emplace(
+        "BT_257",
+        CardDef(power, PlayReqs{ { PlayReq::REQ_TARGET_TO_PLAY, 0 },
+                                 { PlayReq::REQ_MINION_TARGET, 0 } }));
+
 
     // ---------------------------------------- MINION - PRIEST
     // [BT_258] Imprisoned Homunculus - COST: 1 [ATK: 2/HP: 5]
@@ -934,6 +959,9 @@ void BlackTempleCardsGen::AddPriestNonCollect(
     // --------------------------------------------------------
     // Text: +1/+2.
     // --------------------------------------------------------
+    power.ClearData();
+    power.AddEnchant(Enchants::GetEnchantFromText("BT_253e"));
+    cards.emplace("BT_253e", CardDef(power));
 
     // ----------------------------------- ENCHANTMENT - PRIEST
     // [BT_256e] Booted - COST: 0
@@ -948,6 +976,9 @@ void BlackTempleCardsGen::AddPriestNonCollect(
     // --------------------------------------------------------
     // Text: +2/+3 and <b>Lifesteal</b>.
     // --------------------------------------------------------
+    power.ClearData();
+    power.AddEnchant(Enchants::GetEnchantFromText("BT_257e"));
+    cards.emplace("BT_257e", CardDef(power));
 
     // ----------------------------------- ENCHANTMENT - PRIEST
     // [BT_262e] Nether Sight - COST: 0

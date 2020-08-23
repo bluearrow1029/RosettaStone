@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2019 Chris Ohk, Youngjoong Kim, SeungHyun Jeon
+// Copyright (c) 2019 Chris Ohk, Youngjoong Kim, SeungHyun Jeon
 
 // We are making my contributions/submissions to this project solely in our
 // personal capacity and are not conveying any rights to any intellectual
 // property of any third parties.
 
 #include <Utils/CardSetUtils.hpp>
+#include <Utils/TestUtils.hpp>
 
 #include <Rosetta/PlayMode/Actions/Draw.hpp>
 #include <Rosetta/PlayMode/Cards/Cards.hpp>
@@ -204,6 +205,146 @@ TEST_CASE("[Druid : Minion] - BT_131 : Ysiel Windsinger")
     game.Process(curPlayer,
                  PlayCardTask::SpellTarget(card2, opPlayer->GetHero()));
     CHECK_EQ(curPlayer->GetRemainingMana(), 10);
+}
+
+// ----------------------------------------- SPELL - PRIEST
+// [BT_252] Renew - COST: 1
+//  - Set: BLACK_TEMPLE, Rarity: Common
+// --------------------------------------------------------
+// Text: Restore 3 Health. <b>Discover</b> a spell.
+// --------------------------------------------------------
+// GameTag:
+//  - DISCOVER = 1
+// --------------------------------------------------------
+TEST_CASE("[Preist : Spell] - BT_252 : Renew")
+{
+    GameConfig config;
+    config.player1Class = CardClass::PRIEST;
+    config.player2Class = CardClass::HUNTER;
+    config.startPlayer = PlayerType::PLAYER1;
+    config.doFillDecks = true;
+    config.autoRun = false;
+
+    Game game(config);
+    game.Start();
+    game.ProcessUntil(Step::MAIN_ACTION);
+
+    Player* curPlayer = game.GetCurrentPlayer();
+    Player* opPlayer = game.GetOpponentPlayer();
+    curPlayer->SetTotalMana(10);
+    curPlayer->SetUsedMana(0);
+    opPlayer->SetTotalMana(10);
+    opPlayer->SetUsedMana(0);
+    curPlayer->GetHero()->SetDamage(5);
+
+    const auto card1 =
+        Generic::DrawCard(curPlayer, Cards::FindCardByName("Renew"));
+
+    game.Process(curPlayer,
+                 PlayCardTask::SpellTarget(card1, curPlayer->GetHero()));
+    CHECK_EQ(curPlayer->GetHero()->GetHealth(), 28);
+    CHECK(curPlayer->choice != nullptr);
+    CHECK_EQ(curPlayer->choice->choices.size(), 3);
+
+    auto cards = TestUtils::GetChoiceCards(game);
+    for (auto& card : cards)
+    {
+        CHECK_EQ(card->GetCardType(), CardType::SPELL);
+        CHECK_EQ(card->IsCardClass(CardClass::PRIEST), true);
+    }
+}
+
+// ----------------------------------------- SPELL - PRIEST
+// [BT_253] Psyche Split - COST: 5
+//  - Set: BLACK_TEMPLE, Rarity: Rare
+// --------------------------------------------------------
+// Text: Give a minion +1/+2. Summon a copy of it.
+// --------------------------------------------------------
+TEST_CASE("[Preist : Spell] - BT_253 : Psyche Split")
+{
+    GameConfig config;
+    config.player1Class = CardClass::PRIEST;
+    config.player2Class = CardClass::MAGE;
+    config.startPlayer = PlayerType::PLAYER1;
+    config.doFillDecks = true;
+    config.autoRun = false;
+
+    Game game(config);
+    game.Start();
+    game.ProcessUntil(Step::MAIN_ACTION);
+
+    Player* curPlayer = game.GetCurrentPlayer();
+    Player* opPlayer = game.GetOpponentPlayer();
+    curPlayer->SetTotalMana(10);
+    curPlayer->SetUsedMana(0);
+    opPlayer->SetTotalMana(10);
+    opPlayer->SetUsedMana(0);
+
+    auto& curField = *(curPlayer->GetFieldZone());
+
+    const auto card1 =
+        Generic::DrawCard(curPlayer, Cards::FindCardByName("Psyche Split"));
+    const auto card2 =
+        Generic::DrawCard(curPlayer, Cards::FindCardByName("Loot Hoarder"));
+
+    game.Process(curPlayer, PlayCardTask::Minion(card2));
+    CHECK_EQ(curField.GetCount(), 1);
+    CHECK_EQ(curField[0]->GetAttack(), 2);
+    CHECK_EQ(curField[0]->GetHealth(), 1);
+
+    game.Process(curPlayer, PlayCardTask::SpellTarget(card1, card2));
+    CHECK_EQ(curField.GetCount(), 2);
+    CHECK_EQ(curField[0]->GetAttack(), 3);
+    CHECK_EQ(curField[0]->GetHealth(), 3);
+    CHECK_EQ(curField[1]->GetAttack(), 3);
+    CHECK_EQ(curField[1]->GetHealth(), 3);
+}
+
+// ----------------------------------------- SPELL - PRIEST
+// [BT_257] Apotheosis - COST: 3
+//  - Set: BLACK_TEMPLE, Rarity: Common
+// --------------------------------------------------------
+// Text: Give a minion +2/+3 and <b>Lifesteal</b>.
+// --------------------------------------------------------
+// RefTag:
+//  - LIFESTEAL = 1
+// --------------------------------------------------------
+TEST_CASE("[Preist : Spell] - BT_257 : Apotheosis")
+{
+    GameConfig config;
+    config.player1Class = CardClass::PRIEST;
+    config.player2Class = CardClass::MAGE;
+    config.startPlayer = PlayerType::PLAYER1;
+    config.doFillDecks = true;
+    config.autoRun = false;
+
+    Game game(config);
+    game.Start();
+    game.ProcessUntil(Step::MAIN_ACTION);
+
+    Player* curPlayer = game.GetCurrentPlayer();
+    Player* opPlayer = game.GetOpponentPlayer();
+    curPlayer->SetTotalMana(10);
+    curPlayer->SetUsedMana(0);
+    opPlayer->SetTotalMana(10);
+    opPlayer->SetUsedMana(0);
+
+    const auto card1 =
+        Generic::DrawCard(curPlayer, Cards::FindCardByName("Apotheosis"));
+    const auto card2 =
+        Generic::DrawCard(curPlayer, Cards::FindCardByName("Loot Hoarder"));
+
+    auto& curField = *(curPlayer->GetFieldZone());
+
+    game.Process(curPlayer, PlayCardTask::Minion(card2));
+    CHECK_EQ(curField[0]->GetGameTag(GameTag::LIFESTEAL), 0);
+    CHECK_EQ(curField[0]->GetAttack(), 2);
+    CHECK_EQ(curField[0]->GetHealth(), 1);
+
+    game.Process(curPlayer, PlayCardTask::SpellTarget(card1, card2));
+    CHECK_EQ(curField[0]->GetGameTag(GameTag::LIFESTEAL), 1);
+    CHECK_EQ(curField[0]->GetAttack(), 4);
+    CHECK_EQ(curField[0]->GetHealth(), 4);
 }
 
 // ---------------------------------------- MINION - PRIEST
@@ -642,7 +783,7 @@ TEST_CASE("[Warrior : Spell] - BT_124 : Corsair Cache")
 // [BT_509] Fel Summoner - COST: 6 [ATK: 8/HP: 3]
 //  - Set: BLACK_TEMPLE, Rarity: Common
 // --------------------------------------------------------
-// Text: <b>Deathrattle:</b> Summon a random Demon from your hand.
+// Text: <b>Deathrattle:</b> Summon a random Demon from your hand.
 // --------------------------------------------------------
 // GameTag:
 //  - DEATHRATTLE = 1

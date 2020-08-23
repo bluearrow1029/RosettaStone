@@ -666,7 +666,7 @@ ULDUM | ULD_183 | Anubisath Warbringer |
 ULDUM | ULD_184 | Kobold Sandtrooper | O
 ULDUM | ULD_185 | Temple Berserker |  
 ULDUM | ULD_186 | Pharaoh Cat | O
-ULDUM | ULD_188 | Golden Scarab |  
+ULDUM | ULD_188 | Golden Scarab | O
 ULDUM | ULD_189 | Faceless Lurker |  
 ULDUM | ULD_190 | Pit Crocolisk | O
 ULDUM | ULD_191 | Beaming Sidekick | O
@@ -1026,12 +1026,12 @@ BLACK_TEMPLE | BT_214 | Beastmaster Leoroxx |
 BLACK_TEMPLE | BT_230 | The Lurker Below |  
 BLACK_TEMPLE | BT_233 | Sword and Board |  
 BLACK_TEMPLE | BT_249 | Scrap Golem |  
-BLACK_TEMPLE | BT_252 | Renew |  
-BLACK_TEMPLE | BT_253 | Psyche Split |  
+BLACK_TEMPLE | BT_252 | Renew | O
+BLACK_TEMPLE | BT_253 | Psyche Split | O
 BLACK_TEMPLE | BT_254 | Sethekk Veilweaver |  
 BLACK_TEMPLE | BT_255 | Kael'thas Sunstrider |  
 BLACK_TEMPLE | BT_256 | Dragonmaw Overseer |  
-BLACK_TEMPLE | BT_257 | Apotheosis |  
+BLACK_TEMPLE | BT_257 | Apotheosis | O
 BLACK_TEMPLE | BT_258 | Imprisoned Homunculus | O
 BLACK_TEMPLE | BT_262 | Dragonmaw Sentinel |  
 BLACK_TEMPLE | BT_291 | Apexis Blast |  
@@ -1102,7 +1102,7 @@ SCHOLOMANCE | SCH_126 | Disciplinarian Gandling |
 SCHOLOMANCE | SCH_133 | Wolpertinger |  
 SCHOLOMANCE | SCH_135 | Turalyon, the Tenured |  
 SCHOLOMANCE | SCH_136 | Power Word: Feast |  
-SCHOLOMANCE | SCH_137 | Frazzled Freshman |  
+SCHOLOMANCE | SCH_137 | Frazzled Freshman | O 
 SCHOLOMANCE | SCH_138 | Blessing of Authority |  
 SCHOLOMANCE | SCH_139 | Devout Pupil |  
 SCHOLOMANCE | SCH_140 | Flesh Giant |  
